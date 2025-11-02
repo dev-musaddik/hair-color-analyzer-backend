@@ -1,0 +1,80 @@
+from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+import hashlib
+from typing import List
+import uvicorn
+
+from hair_analyzer import analyze_hair_color
+from cache import init_db, get_cached_result, cache_result
+
+app = FastAPI(title="Hair Color Analyzer API")
+
+# CORS configuration
+origins = [
+    "http://localhost:3000",
+    "http://localhost:5173", # Vite default port
+    # Add your frontend production URL here
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.on_event("startup")
+async def startup_event():
+    await init_db()
+
+@app.post("/analyze-hair")
+async def analyze_hair(images: List[UploadFile] = File(...)):
+    """
+    Analyzes a list of images to determine the dominant hair color.
+    - Caches results based on image content.
+    - Uses YOLOv8 for hair detection.
+    """
+    results = []
+    for image in images:
+        image_bytes = await image.read()
+        image_hash = hashlib.sha256(image_bytes).hexdigest()
+
+        # Check cache first
+        cached_result = await get_cached_result(image_hash)
+        if cached_result:
+            rgb, hex_val = cached_result
+            results.append({
+                "filename": image.filename,
+                "dominant_color_rgb": rgb,
+                "dominant_color_hex": hex_val,
+                "from_cache": True,
+            })
+            continue
+
+        # If not in cache, analyze the image
+        try:
+            analysis_result = analyze_hair_color(image_bytes)
+            if "error" in analysis_result:
+                raise HTTPException(status_code=400, detail=analysis_result["error"])
+
+            # Cache the new result
+            await cache_result(
+                image_hash,
+                analysis_result["dominant_color_rgb"],
+                analysis_result["dominant_color_hex"]
+            )
+
+            results.append({
+                "filename": image.filename,
+                "dominant_color_rgb": analysis_result["dominant_color_rgb"],
+                "dominant_color_hex": analysis_result["dominant_color_hex"],
+                "from_cache": False,
+            })
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"An error occurred during analysis: {str(e)}")
+
+    return {"results": results}
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
