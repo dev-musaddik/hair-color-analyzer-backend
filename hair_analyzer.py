@@ -1,110 +1,151 @@
 import io
-import cv2
-import torch
 import numpy as np
 from PIL import Image
 from sklearn.cluster import KMeans
 
 # ----------------------------
-# Load YOLOv8 TorchScript model
+# Predefined Colors
 # ----------------------------
-# Make sure you export your YOLOv8 segmentation model first:
-# yolo export model=yolov8n-seg.pt format=torchscript
-MODEL_PATH = "yolov8n-seg.ts"
-model = torch.jit.load(MODEL_PATH, map_location="cpu")
-model.eval()  # set to evaluation mode
+# PREDEFINED_COLORS = {
+#     "#1": "#252628",
+#     "Brown": "#A52A2A",
+#     "Blonde": "#FAFAD2",
+#     "Red": "#FF0000",
+#     "Gray": "#808080",
+#     "White": "#FFFFFF",
+#     "Dark Brown": "#654321",
+#     "Light Brown": "#C4A484",
+#     "Golden Blonde": "#F0E68C",
+#     "Ash Blonde": "#B2BEB5",
+#     "Strawberry Blonde": "#FF9999",
+#     "Auburn": "#A52A2A",
+#     "Chestnut": "#954535",
+#     "Honey": "#FFB347",
+#     "Platinum": "#E5E4E2",
+#     "Silver": "#C0C0C0",
+#     "Jet Black": "#0A0A0A",
+#     "Chocolate Brown": "#7B3F00",
+#     "Caramel": "#FFD700",
+#     "Dirty Blonde": "#C6B895",
+#     "Ginger": "#B06500",
+#     "Burgundy": "#800020",
+#     "Mahogany": "#C04000",
+#     "Copper": "#B87333",
+#     "Titian": "#D2691E",
+#     "Venetian Blonde": "#F7DCB4",
+#     "Ash Brown": "#A9A9A9",
+#     "Sandy Blonde": "#F4A460",
+#     "Dark Blonde": "#9B870C"
+# }
+PREDEFINED_COLORS = {
+    "#2BT8A": "#b69a7b",
+    "#613L_18A": "#cfbfaa",
+    "#6_27": "#675443",
+    "#4C_27": "#65594b",
+    "#4B_27": "#b19166",
+    "#2BT6": "#92755a",
+    "#2CT5": "#826146",
+    "#13A_24": "#d0c3ae",
+    "#64": "#dacec1",
+    "#62": "#e3d8c0",
+    "#60A": "#dfd7c5",
+    "#50": "#c4c8ca",
+    "#30A": "#754b3d",
+    "#27": "#d7c4a2",
+    "#13A": "#cdb398",
+    "#10A": "#a68560",
+    "#8A": "#967d62",
+    "#5A": "#755539",
+    "#4C": "#5c463f",
+    "#4B": "#845b38",
+    "#3A": "#76523b",
+    "#2C": "#675141",
+    "#2B": "#40332e",
+    "#1C": "#2f2f2f",
+    "#1B": "#252628",
+    "#1": "#252628"
+}
+
+
 
 # ----------------------------
-# Helper function: Dominant color
+# Helper function: Hex to RGB
+# ----------------------------
+def hex_to_rgb(hex_color):
+    hex_color = hex_color.lstrip('#')
+    return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+
+# ----------------------------
+# Helper function: Color difference
+# ----------------------------
+def color_difference(rgb1, rgb2):
+    return np.sqrt(sum([(c1 - c2) ** 2 for c1, c2 in zip(rgb1, rgb2)]))
+
+# ----------------------------
+# Helper function: Find closest color
+# ----------------------------
+def find_closest_color(detected_rgb, color_map):
+    closest_color_name = None
+    min_difference = float('inf')
+    
+    for color_name, hex_value in color_map.items():
+        predefined_rgb = hex_to_rgb(hex_value)
+        difference = color_difference(detected_rgb, predefined_rgb)
+        
+        if difference < min_difference:
+            min_difference = difference
+            closest_color_name = color_name
+            
+    max_diff = np.sqrt(3 * (255 ** 2))
+    similarity_percentage = 100 * (1 - min_difference / max_diff)
+    
+    return closest_color_name, similarity_percentage
+
+# ----------------------------
+# Helper function: Get dominant color from an image
 # ----------------------------
 def get_dominant_color(image: Image.Image) -> tuple:
-    image = image.resize((100, 100))
+    # Resize for performance
+    image = image.resize((150, 150))
     np_image = np.array(image)
     np_image = np_image.reshape((-1, 3))
 
-    # Remove black pixels
-    non_black_pixels = np_image[np.any(np_image != [0, 0, 0], axis=1)]
-    if len(non_black_pixels) == 0:
-        return (0, 0, 0), "#000000"
+    # Use KMeans to find dominant colors
+    n_clusters = 5
+    kmeans = KMeans(n_clusters=n_clusters, n_init='auto', random_state=42)
+    kmeans.fit(np_image)
 
-    n_clusters = min(3, len(non_black_pixels))
-    kmeans = KMeans(n_clusters=n_clusters, n_init=10, random_state=42)
-    kmeans.fit(non_black_pixels)
-
+    # Find the most frequent cluster
     counts = np.bincount(kmeans.labels_)
     dominant_cluster = np.argmax(counts)
     dominant_color = kmeans.cluster_centers_[dominant_cluster].astype(int)
 
     rgb_color = tuple(int(c) for c in dominant_color)
-    hex_color = "#%02x%02x%02x" % rgb_color
+    hex_color = f"#{rgb_color[0]:02x}{rgb_color[1]:02x}{rgb_color[2]:02x}"
     return rgb_color, hex_color
 
 # ----------------------------
-# Main function: Analyze hair color
+# Main analysis function
 # ----------------------------
-def analyze_hair_color(image_bytes: bytes) -> dict:
-    image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-    np_image = np.array(image)
+def analyze_image_color(image_bytes: bytes) -> dict:
+    try:
+        image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+        
+        # Get the dominant color of the entire image
+        dominant_rgb, dominant_hex = get_dominant_color(image)
+        
+        # Find the closest predefined color
+        closest_color_name, match_percentage = find_closest_color(dominant_rgb, PREDEFINED_COLORS)
+        
+        # Create a result message
+        message = f"The dominant color is {dominant_hex}, which is closest to your predefined color '{closest_color_name}'."
 
-    # YOLOv8 TorchScript expects torch.Tensor
-    input_tensor = torch.from_numpy(np_image).permute(2, 0, 1).unsqueeze(0).float()
-    input_tensor /= 255.0  # normalize
-
-    with torch.no_grad():
-        outputs = model(input_tensor)  # model returns a dict with masks/boxes
-
-    # Extract masks and boxes
-    masks = outputs[0]["masks"].numpy() if "masks" in outputs[0] else None
-    boxes = outputs[0]["boxes"].numpy() if "boxes" in outputs[0] else None
-    classes = outputs[0]["classes"].numpy() if "classes" in outputs[0] else None
-
-    if masks is None or boxes is None or classes is None:
-        return {"error": "No person detected."}
-
-    # Filter person masks
-    person_masks = []
-    person_boxes = []
-    for i, cls in enumerate(classes):
-        if int(cls) == 0:  # 'person' class in COCO is 0
-            person_masks.append(masks[i])
-            person_boxes.append(boxes[i])
-
-    if not person_masks:
-        return {"error": "No person detected."}
-
-    # Combine masks
-    combined_mask = np.sum(person_masks, axis=0)
-    combined_mask = (combined_mask > 0).astype(np.uint8)
-    combined_mask = cv2.resize(combined_mask, (np_image.shape[1], np_image.shape[0]), interpolation=cv2.INTER_NEAREST)
-
-    # Take first person box for hair region
-    box = person_boxes[0]
-    x1, y1, x2, y2 = map(int, box)
-    hair_region_y_end = y1 + int((y2 - y1) * 0.25)
-
-    hair_mask = np.zeros_like(combined_mask)
-    hair_mask[y1:hair_region_y_end, x1:x2] = 1
-    final_hair_mask = combined_mask * hair_mask
-
-    if np.sum(final_hair_mask) == 0:
-        return {"error": "Could not isolate hair region."}
-
-    hair_only_image = cv2.bitwise_and(np_image, np_image, mask=final_hair_mask)
-    hair_pil_image = Image.fromarray(hair_only_image)
-
-    rgb_color, hex_color = get_dominant_color(hair_pil_image)
-
-    return {
-        "dominant_color_rgb": rgb_color,
-        "dominant_color_hex": hex_color,
-    }
-
-# ----------------------------
-# Example usage
-# ----------------------------
-if __name__ == "__main__":
-    with open("test_image.jpg", "rb") as f:
-        image_bytes = f.read()
-
-    result = analyze_hair_color(image_bytes)
-    print(result)
+        return {
+            "dominant_color_rgb": dominant_rgb,
+            "dominant_color_hex": dominant_hex,
+            "closest_color": closest_color_name,
+            "match_percentage": f"{match_percentage:.2f}%",
+            "message": message
+        }
+    except Exception as e:
+        return {"error": f"Failed to analyze image: {str(e)}"}

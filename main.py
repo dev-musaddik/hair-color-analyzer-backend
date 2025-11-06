@@ -4,15 +4,15 @@ import hashlib
 from typing import List
 import uvicorn
 
-from hair_analyzer import analyze_hair_color
+from hair_analyzer import analyze_image_color
 from cache import init_db, get_cached_result, cache_result
 
-app = FastAPI(title="Hair Color Analyzer API")
+app = FastAPI(title="Color Analyzer API")
 
 # CORS configuration
 origins = [
     "http://localhost:3000",
-    "http://localhost:5173", # Vite default port
+    "http://localhost:5173",  # Vite default port
     # Add your frontend production URL here
 ]
 
@@ -28,12 +28,11 @@ app.add_middleware(
 async def startup_event():
     await init_db()
 
-@app.post("/analyze-hair")
-async def analyze_hair(images: List[UploadFile] = File(...)):
+@app.post("/analyze-color")
+async def analyze_color(images: List[UploadFile] = File(...)):
     """
-    Analyzes a list of images to determine the dominant hair color.
+    Analyzes a list of images to determine the dominant color.
     - Caches results based on image content.
-    - Uses YOLOv8 for hair detection.
     """
     results = []
     for image in images:
@@ -43,18 +42,21 @@ async def analyze_hair(images: List[UploadFile] = File(...)):
         # Check cache first
         cached_result = await get_cached_result(image_hash)
         if cached_result:
-            rgb, hex_val = cached_result
+            rgb, hex_val, closest_color, match_percentage = cached_result
             results.append({
                 "filename": image.filename,
                 "dominant_color_rgb": rgb,
                 "dominant_color_hex": hex_val,
+                "closest_color": closest_color,
+                "match_percentage": match_percentage,
+                "message": f"The dominant color is {hex_val}, which is closest to your predefined color '{closest_color}'.",
                 "from_cache": True,
             })
             continue
 
         # If not in cache, analyze the image
         try:
-            analysis_result = analyze_hair_color(image_bytes)
+            analysis_result = analyze_image_color(image_bytes)
             if "error" in analysis_result:
                 raise HTTPException(status_code=400, detail=analysis_result["error"])
 
@@ -62,13 +64,14 @@ async def analyze_hair(images: List[UploadFile] = File(...)):
             await cache_result(
                 image_hash,
                 analysis_result["dominant_color_rgb"],
-                analysis_result["dominant_color_hex"]
+                analysis_result["dominant_color_hex"],
+                analysis_result["closest_color"],
+                analysis_result["match_percentage"]
             )
 
             results.append({
                 "filename": image.filename,
-                "dominant_color_rgb": analysis_result["dominant_color_rgb"],
-                "dominant_color_hex": analysis_result["dominant_color_hex"],
+                **analysis_result,
                 "from_cache": False,
             })
         except Exception as e:
