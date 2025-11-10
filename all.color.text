@@ -1,0 +1,289 @@
+PREDEFINED_COLOR_SETS = {
+    # ===== Single Colors =====
+    "#1 Jet Black": {
+        "composition": [
+            {"hex": "#0A0A0A", "percentage": 85},
+            {"hex": "#1B1B1B", "percentage": 15}
+        ]
+    },
+    "#1B Off Black": {
+        "composition": [
+            {"hex": "#1C1C1C", "percentage": 85},
+            {"hex": "#2A2A2A", "percentage": 15}
+        ]
+    },
+    "#1C Expresso Brown": {
+        "composition": [
+            {"hex": "#3B2F2F", "percentage": 85},
+            {"hex": "#4A3B2A", "percentage": 15}
+        ]
+    },
+    "#2B Dark Amber": {
+        "composition": [
+            {"hex": "#4E342E", "percentage": 85},
+            {"hex": "#5D4037", "percentage": 15}
+        ]
+    },
+    "#2C Coco loco": {
+        "composition": [
+            {"hex": "#5B3A29", "percentage": 85},
+            {"hex": "#7B4F3A", "percentage": 15}
+        ]
+    },
+    "#3A Midnight Mocha": {
+        "composition": [
+            {"hex": "#3C2A1E", "percentage": 85},
+            {"hex": "#5A3E2E", "percentage": 15}
+        ]
+    },
+    "#4B Tosted Caramel": {
+        "composition": [
+            {"hex": "#7B4A2E", "percentage": 85},
+            {"hex": "#A66A3F", "percentage": 15}
+        ]
+    },
+    "#4C Espresso Martini": {
+        "composition": [
+            {"hex": "#4B382A", "percentage": 85},
+            {"hex": "#7B563A", "percentage": 15}
+        ]
+    },
+    "#5 Medium Ash Brown": {
+        "composition": [
+            {"hex": "#6E5A48", "percentage": 85},
+            {"hex": "#8B725E", "percentage": 15}
+        ]
+    },
+    "#5A Chestnut Charm": {
+        "composition": [
+            {"hex": "#7A4F37", "percentage": 85},
+            {"hex": "#A36F52", "percentage": 15}
+        ]
+    },
+    "#6 Brown": {
+        "composition": [
+            {"hex": "#704214", "percentage": 85},
+            {"hex": "#8B5A2B", "percentage": 15}
+        ]
+    },
+    "#6A Medium Ash": {
+        "composition": [
+            {"hex": "#7E6A5A", "percentage": 85},
+            {"hex": "#A18E7B", "percentage": 15}
+        ]
+    },
+    "#8A Butterscotch Bliss": {
+        "composition": [
+            {"hex": "#C08A53", "percentage": 85},
+            {"hex": "#E2B47C", "percentage": 15}
+        ]
+    },
+    "#10A Honeycomb Haze": {
+        "composition": [
+            {"hex": "#D6AE7B", "percentage": 85},
+            {"hex": "#F0C890", "percentage": 15}
+        ]
+    },
+    "#12 Copper Blonde": {
+        "composition": [
+            {"hex": "#CC7733", "percentage": 85},
+            {"hex": "#E38D47", "percentage": 15}
+        ]
+    },
+    "#13A Fudge": {
+        "composition": [
+            {"hex": "#8B5A2B", "percentage": 85},
+            {"hex": "#A66C3E", "percentage": 15}
+        ]
+    },
+    "#14 Dark Blonde": {
+        "composition": [
+            {"hex": "#C69C6D", "percentage": 85},
+            {"hex": "#E2B77A", "percentage": 15}
+        ]
+    },
+    "#16 Beige Blonde": {
+        "composition": [
+            {"hex": "#E3C28D", "percentage": 85},
+            {"hex": "#F2D9A6", "percentage": 15}
+        ]
+    },
+    "#18 Honey Blonde": {
+        "composition": [
+            {"hex": "#E2B76B", "percentage": 85},
+            {"hex": "#F5D79B", "percentage": 15}
+        ]
+    },
+    "#18A Cool Honey Blonde": {
+        "composition": [
+            {"hex": "#D9B178", "percentage": 85},
+            {"hex": "#EBD0A1", "percentage": 15}
+        ]
+    },
+    "#24 Golden Blonde": {
+        "composition": [
+            {"hex": "#F2CB61", "percentage": 85},
+            {"hex": "#FFD98E", "percentage": 15}
+        ]
+    },
+    "#27 Strawberry Blonde": {
+        "composition": [
+            {"hex": "#E6A57E", "percentage": 85},
+            {"hex": "#F6C5A5", "percentage": 15}
+        ]
+    },
+    "#30 Light Auburn": {
+        "composition": [
+            {"hex": "#B35C3E", "percentage": 85},
+            {"hex": "#D77A59", "percentage": 15}
+        ]
+    },
+    "#30A Cranberry Kiss": {
+        "composition": [
+            {"hex": "#A9474F", "percentage": 85},
+            {"hex": "#C06068", "percentage": 15}
+        ]
+    },
+    "#33 Copper Red": {
+        "composition": [
+            {"hex": "#B85D3D", "percentage": 85},
+            {"hex": "#D87B55", "percentage": 15}
+        ]
+    },
+    "#50 Light Silver Grey": {
+        "composition": [
+            {"hex": "#C0C0C0", "percentage": 85},
+            {"hex": "#E0E0E0", "percentage": 15}
+        ]
+    },
+    "#60A Light Platinum Ash Blonde": {
+        "composition": [
+            {"hex": "#E6E1D3", "percentage": 85},
+            {"hex": "#F7F5ED", "percentage": 15}
+        ]
+    },
+    "#62 Light Ash Blonde": {
+        "composition": [
+            {"hex": "#E6D8B5", "percentage": 85},
+            {"hex": "#F2E5C4", "percentage": 15}
+        ]
+    },
+    "#64 Champagne Blonde": {
+        "composition": [
+            {"hex": "#F7E0B5", "percentage": 85},
+            {"hex": "#FFF0CE", "percentage": 15}
+        ]
+    },
+    "#98J Mahogany": {
+        "composition": [
+            {"hex": "#4A1F16", "percentage": 85},
+            {"hex": "#6A2F22", "percentage": 15}
+        ]
+    },
+    "#99J Burgundy": {
+        "composition": [
+            {"hex": "#582B3D", "percentage": 85},
+            {"hex": "#7A3A4D", "percentage": 15}
+        ]
+    },
+    "#130 Red Ruby": {
+        "composition": [
+            {"hex": "#A0141E", "percentage": 85},
+            {"hex": "#C02A32", "percentage": 15}
+        ]
+    },
+    "#613L Light Bleach Blonde": {
+        "composition": [
+            {"hex": "#FAF0C0", "percentage": 85},
+            {"hex": "#FFF7DA", "percentage": 15}
+        ]
+    },
+
+    # ===== Highlight Colors =====
+    "#4B/27 Tosted Caramel /Strawberry Blonde": {
+        "composition": [
+            {"hex": "#7B4A2E", "percentage": 70},
+            {"hex": "#E6A57E", "percentage": 30}
+        ]
+    },
+    "#4C/27 Espresso Martini/Strawberry Blonde": {
+        "composition": [
+            {"hex": "#4B382A", "percentage": 70},
+            {"hex": "#E6A57E", "percentage": 30}
+        ]
+    },
+    "#6/27 Brown / Strawberry Blonde": {
+        "composition": [
+            {"hex": "#704214", "percentage": 70},
+            {"hex": "#E6A57E", "percentage": 30}
+        ]
+    },
+    "#10A/16 Honeycomb Haze / Beige Blonde": {
+        "composition": [
+            {"hex": "#D6AE7B", "percentage": 70},
+            {"hex": "#E3C28D", "percentage": 30}
+        ]
+    },
+    "#13A/16 Fudge/Beige Blonde": {
+        "composition": [
+            {"hex": "#8B5A2B", "percentage": 70},
+            {"hex": "#E3C28D", "percentage": 30}
+        ]
+    },
+    "#13A/24 Fudge/Golden Blonde": {
+        "composition": [
+            {"hex": "#8B5A2B", "percentage": 70},
+            {"hex": "#F2CB61", "percentage": 30}
+        ]
+    },
+    "#14/24 Dark Blonde / Golden Blonde": {
+        "composition": [
+            {"hex": "#C69C6D", "percentage": 70},
+            {"hex": "#F2CB61", "percentage": 30}
+        ]
+    },
+    "#60A/62 Light Platinum Ash Blonde/Light Ash Blonde": {
+        "composition": [
+            {"hex": "#E6E1D3", "percentage": 70},
+            {"hex": "#E6D8B5", "percentage": 30}
+        ]
+    },
+    "#613L/16 Light Bleach Blonde / Beige Blonde": {
+        "composition": [
+            {"hex": "#FAF0C0", "percentage": 70},
+            {"hex": "#E3C28D", "percentage": 30}
+        ]
+    },
+    "#613L/18A Light Bleach Blonde/ Cool honey Blonde": {
+        "composition": [
+            {"hex": "#FAF0C0", "percentage": 70},
+            {"hex": "#D9B178", "percentage": 30}
+        ]
+    },
+    "#613L/27 Light Bleach Blonde / Strawberry Blonde": {
+        "composition": [
+            {"hex": "#FAF0C0", "percentage": 70},
+            {"hex": "#E6A57E", "percentage": 30}
+        ]
+    },
+
+    # ===== Rooted (T-shades) =====
+    "#2BT6 Dark Amber /Brown": {
+        "composition": [
+            {"hex": "#4E342E", "percentage": 70},
+            {"hex": "#704214", "percentage": 30}
+        ]
+    },
+    "#2BT8A Dark Amber /Butterscotch Bliss": {
+        "composition": [
+            {"hex": "#4E342E", "percentage": 70},
+            {"hex": "#C08A53", "percentage": 30}
+        ]
+    },
+    "#2CT5 Coco loco/Medium Ash Brown": {
+        "composition": [
+            {"hex": "#5B3A29", "percentage": 70},
+            {"hex": "#6E5A48", "percentage": 30}
+        ]
+    }
+}
